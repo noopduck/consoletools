@@ -52,4 +52,23 @@ rm fonts.tar.gz # cleanup font download
 # Install nord theme for gnome-terminal
 curl https://raw.githubusercontent.com/arcticicestudio/nord-gnome-terminal/develop/src/nord.sh | bash
 
+# Make sure that zshrc has node setup  configured properly, this adds an alias for nvim as vim too.
+ZSHRC_CONF_PART=$(curl https://raw.githubusercontent.com/noopduck/consoletools/master/shell_customizations/zshrc_component.txt)
+
+[[ "$SHELL" =~ "zsh" ]] && {
+	echo "Found zsh shell running"
+	for i in $(find ~/.* -type f -name ".zshrc" -print0 2>/dev/null|xargs -0 echo); do
+		if [[ -f $i ]]; then
+			ZSHRC=$i
+		fi
+	done
+
+	! grep "$ZSHRC_CONF_PART" $ZSHRC >/dev/null && {
+                echo "Added config part to $ZSHRC"
+                cat "$ZSHRC_CONF_PART" >> $i
+        } || {
+		echo "Entry already exists inside $ZSHRC"
+        }
+}
+
 echo "Restart terminal after this..."
