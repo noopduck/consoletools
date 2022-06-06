@@ -65,7 +65,7 @@ ZSHRC_CONF_PART=$(curl https://raw.githubusercontent.com/noopduck/consoletools/m
 
 	! grep "$ZSHRC_CONF_PART" $ZSHRC >/dev/null && {
                 echo "Added config part to $ZSHRC"
-                cat "$ZSHRC_CONF_PART" >> $i
+                cat "$ZSHRC_CONF_PART" >> $ZSHRC
         } || {
 		echo "Entry already exists inside $ZSHRC"
         }
