@@ -1,0 +1,12 @@
+{
+    "explorer.width":30,
+    "explorer.position": "left",
+    "explorer.icon.enableNerdfont": true,
+    "explorer.previewAction.onHover": false,
+    "explorer.keyMappings.global": {
+        "<cr>": ["expandable?", "expand", "open"],
+        "v": "open:vsplit"
+    },
+
+    "python.pythonPath": "/usr/bin/python"
+}
