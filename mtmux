@@ -52,7 +52,7 @@ SESSIONS=$(tmux list-sessions | grep $SESSION)
         SESSION=$(tmux list-sessions -F '#{session_name}'|grep $(whoami))
 
         for i in $(tmux list-windows -t $SESSION -F '#{window_id}'); do
-                tmux send -t $SESSION:$i 'export SSH_AUTH_SOCK=$(find /tmp -user $(whoami) -iname *agent.* 2>/dev/null)' 'ENTER';
+                tmux send -t $SESSION:$i 'export SSH_AUTH_SOCK=$(find /tmp -user $(whoami) -iname "*agent.*" 2>/dev/null)' 'ENTER';
         done
 
         tmux attach-session -t $SESSION:0
