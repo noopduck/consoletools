@@ -6,12 +6,12 @@
 function setup_software() {
 	if [[ -f /etc/debian_version ]]; then
 		echo "apt install zsh if not already installed"
-		sudo apt -y install zsh
+		sudo apt -y install zsh fzf
 	
 	elif [[ "$(uname -r)" =~ "MANJARO" ]]; then
 		echo "pacman installing zsh if not already installed"
 		[[ ! $(pacman -Qs python-pip|grep "local/zsh") ]] && {
-                        sudo pacman --noconfirm -S zsh
+                        sudo pacman --noconfirm -S zsh fzf
                 }
 	
 	elif [[ "$(grep "ID=fedora" /etc/os-release)" ]]; then
@@ -19,7 +19,7 @@ function setup_software() {
 	
 		[[ $(which dnf) ]] && {
 			echo "dnf installing zsh if not already installed"
-			sudo dnf install -y zsh util-linux-user
+			sudo dnf install -y zsh util-linux-user fzf
 		}
 	fi
 }
