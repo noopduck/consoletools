@@ -10,7 +10,7 @@ export PATH=$PATH:~/.local/bin
 }
 
 # Establish ssh-agent if none is running
-[ ! "$(ps -fe|grep ssh-agent)" ] && {
+[ ! "$(ps -fe|grep ssh-agent|grep -v grep)" ] && {
         eval $(ssh-agent -s)
         ssh-add
 }
