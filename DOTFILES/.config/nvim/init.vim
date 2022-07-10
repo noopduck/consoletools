@@ -27,7 +27,6 @@ syntax on
 set relativenumber
 set clipboard=unnamedplus " set to system clipboard, yank,delete pops to sysclipboard
 filetype plugin indent on
-set expandtab
 set smartindent
 set tabstop=4
 set shiftwidth=4
