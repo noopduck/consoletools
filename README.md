@@ -92,6 +92,9 @@ Customization of zsh, adds some nice fonts to local user and allow to theme it a
 curl https://raw.githubusercontent.com/noopduck/consoletools/master/shell_customizations/zsh_setup.sh | bash
 ```
 
+Fix Firefox theme to adhere to adawaita GTK4
+curl -s -o- https://raw.githubusercontent.com/rafaelmardojai/firefox-gnome-theme/master/scripts/install-by-curl.sh | bash
+
 FONTS...
 https://github.com/ryanoasis/nerd-fonts/blob/master/src/glyphs/PowerlineExtraSymbols.otf?raw=true
 https://github.com/ryanoasis/nerd-fonts/blob/master/src/glyphs/Symbols-2048-em%20Nerd%20Font%20Complete.ttf?raw=true
