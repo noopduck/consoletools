@@ -11,14 +11,14 @@ export PATH=$PATH:~/.local/bin
 
 # Establish ssh-agent if none is running
 [ ! "$(ps -fe|grep ssh-agent|grep -v grep)" ] && {
-        eval $(ssh-agent -s)
-        ssh-add
+    eval $(ssh-agent -s)
+    ssh-add
 }
 
 [[ $TERM_PROGRAM ]] && {
-        [[ $TERM_PROGRAM = "vscode" ]] && {
-                exit
-        }
+    [[ $TERM_PROGRAM = "vscode" ]] && {
+        exit
+    }
 }
 
 SESSION=$(whoami)
@@ -30,31 +30,34 @@ SESSIONS=$(tmux list-sessions | grep $SESSION)
 }
 [[ "$SESSIONS" = "" ]] && {
 	[[ ! "$(uname -a)" =~ "microsoft-standard" ]] && {
-        	systemd-run --scope --user tmux new-session -d -s $SESSION
+        systemd-run --scope --user tmux new-session -d -s $SESSION
 	} || {
-		tmux new-session -d -s $SESSION
+        tmux new-session -d -s $SESSION
 	}
-        tmux rename-window -t $SESSION:0 'Chat'
-        tmux send -t $SESSION:0 'TERM=tmux-256color ls' 'ENTER';
-        tmux new-window -t $SESSION:1 -n 'Main'
-        tmux new-window -t $SESSION:2 -n 'Code'
-        tmux select-window -t $SESSION:0
 
-        tmux set-window-option -g mode-keys vi
-        tmux bind h select-pane -L
-        tmux bind j select-pane -D
-        tmux bind k select-pane -U
-        tmux bind l select-pane -R
+    tmux rename-window -t $SESSION:0 'Chat'
+    tmux send -t $SESSION:0 'TERM=tmux-256color ls' 'ENTER';
+    tmux new-window -t $SESSION:1 -n 'Main'
+    tmux new-window -t $SESSION:2 -n 'Code'
+    tmux select-window -t $SESSION:0
+
+    tmux set-window-option -g mode-keys vi
+    tmux bind h select-pane -L
+    tmux bind j select-pane -D
+    tmux bind k select-pane -U
+    tmux bind l select-pane -R
+
+    tmux set-option -g repeat-time 0
 }
 
 [[ ! "$TMUX" ]] && {
-        # Re-establish SSH_AUTH_SOCKET in all open tmux windows
-        SESSION=$(tmux list-sessions -F '#{session_name}'|grep $(whoami))
+    # Re-establish SSH_AUTH_SOCKET in all open tmux windows
+    SESSION=$(tmux list-sessions -F '#{session_name}'|grep $(whoami))
 
-        for i in $(tmux list-windows -t $SESSION -F '#{window_id}'); do
-                tmux send -t $SESSION:$i 'export SSH_AUTH_SOCK=$(find /tmp -user $(whoami) -iname "*agent.*" 2>/dev/null)' 'ENTER';
-        done
+    for i in $(tmux list-windows -t $SESSION -F '#{window_id}'); do
+        tmux send -t $SESSION:$i 'export SSH_AUTH_SOCK=$(find /tmp -user $(whoami) -iname "*agent.*" 2>/dev/null)' 'ENTER';
+    done
 
-        tmux attach-session -t $SESSION:0
+    tmux attach-session -t $SESSION:0
 }
 
