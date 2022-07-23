@@ -8,29 +8,35 @@ call vundle#begin('~/.config/nvim/bundle')
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-airline/vim-airline'
+Plugin 'arcticicestudio/nord-vim'
+Plugin 'rmehri01/onenord.nvim'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 Plugin 'pearofducks/ansible-vim'
-Plugin 'arcticicestudio/nord-vim'
 Plugin 'lilydjwg/colorizer'
 Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 call vundle#end()            " required
 
-let g:nord_cursor_line_number_background = 1
-let g:nord_uniform_status_lines = 1
+"let g:nord_cursor_line_number_background = 1
+"let g:nord_uniform_status_lines = 1
 colorscheme nord
-set background=light
+colorscheme onenord
+set background=dark
+"if (has("termguicolors"))
+"    set termguicolors
+"endif
 
 syntax on
 set relativenumber
 set clipboard=unnamedplus " set to system clipboard, yank,delete pops to sysclipboard
 filetype plugin indent on
+set expandtab
 set smartindent
 set tabstop=4
 set shiftwidth=4
-set expandtab
 
 " SHOW TABLINE
 
