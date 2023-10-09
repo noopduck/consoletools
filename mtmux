@@ -1,0 +1,58 @@
+#!/bin/bash
+
+export PATH=$PATH:~/.local/bin
+
+# Avoid the shell uglyness under /dev/tty type term
+[ ! "$(tty | grep /dev/tty)" ] && {
+    if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+    fi
+}
+
+# Establish ssh-agent if none is running
+[ ! "$(ps -fe|grep ssh-agent|grep -v grep)" ] && {
+        eval $(ssh-agent -s)
+        ssh-add
+}
+
+[[ $TERM_PROGRAM ]] && {
+        [[ $TERM_PROGRAM = "vscode" ]] && {
+                exit
+        }
+}
+
+SESSION=$(whoami)
+
+SESSIONS=$(tmux list-sessions | grep $SESSION)
+
+[[ "$SESSIONS" =~ "no server running" ]] && {
+	SESSIONS=""
+}
+[[ "$SESSIONS" = "" ]] && {
+	[[ ! "$(uname -a)" =~ "microsoft-standard" ]] && {
+        	systemd-run --scope --user tmux new-session -d -s $SESSION
+	} || {
+		tmux new-session -d -s $SESSION
+	}
+        tmux rename-window -t $SESSION:0 'Chat'
+        tmux send -t $SESSION:0 'TERM=tmux-256color ls' 'ENTER';
+        tmux new-window -t $SESSION:1 -n 'Main'
+        tmux new-window -t $SESSION:2 -n 'Code'
+        tmux select-window -t $SESSION:0
+
+        tmux set-window-option -g mode-keys vi
+        tmux bind h select-pane -L
+        tmux bind j select-pane -D
+        tmux bind k select-pane -U
+        tmux bind l select-pane -R
+	
+	tmux bind -n M-k resize-pane -U 5
+	tmux bind -n M-j resize-pane -D 5
+	tmux bind -n M-h resize-pane -L 5
+	tmux bind -n M-l resize-pane -R 5
+}
+
+[[ ! "$TMUX" ]] && {
+        tmux attach-session -t $SESSION:0
+}
+
