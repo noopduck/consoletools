@@ -21,14 +21,16 @@ make an issue or what it's called and I will most likely look at it.
 
 ![Animation of functional i3 setup](https://raw.githubusercontent.com/noopduck/consoletools/master/consoletools.gif)
 
-![Image of nvim working with my setup](https://raw.githubusercontent.com/noopduck/consoletools/master/nvim_setup.png)
+![Image of nvim working with my setup](https://raw.githubusercontent.com/noopduck/consoletools/master/nvim.gif)
 
 **__________________________________________________________________________________________**
 
 NVIM setup
 
 ```shell
-curl https://raw.githubusercontent.com/noopduck/consoletools/master/vim/nvim_setup.sh | bash
+git clone https://github.com/noopduck/consoletools.git
+cd consoletools/vim
+./nvim_setup.sh
 ```
 
 Note: FreeBSD users first need to install a C compiler and a few other things.
@@ -61,18 +63,6 @@ inside ~/.config/nvim/init.vim
 
 **__________________________________________________________________________________________**
 
-VIM setup
-
-ps: This one builds vim from source in order to avoid any issues with compiled-in features,
-I use nvim (neovim) instead, i have not tested this one in a good while, and there are some untested
-changes in the setup of plugins and such. It may require some manual intervention at this point.
-I keep it arround because it may happen that I end up on a more legacy'ish system and may want to trick it out anyway.
-
-```shell
-curl https://raw.githubusercontent.com/noopduck/consoletools/master/vim/config.sh | bash
-```
-**__________________________________________________________________________________________**
-
 TMUX+Powerline setup 
 
 ![Image of nvim working with my setup](https://raw.githubusercontent.com/noopduck/consoletools/master/shell_customizations/tmux-powerline.png)
@@ -81,15 +71,19 @@ ps: This code unlinks /usr/bin/python and links it to /usr/bin/python3
 at least then you are aware in case you use another approach for it.
 
 ```shell
-curl https://raw.githubusercontent.com/noopduck/consoletools/master/shell_customizations/tmux_setup.sh | bash
+git clone https://github.com/noopduck/consoletools.git
+cd consoletools/shell_customizations
+./tmux_setup.sh
 ```
 
 ZSH setup
 
 Customization of zsh, adds some nice fonts to local user and allow to theme it a bit
 
-```
-curl https://raw.githubusercontent.com/noopduck/consoletools/master/shell_customizations/zsh_setup.sh | bash
+```shell
+git clone https://github.com/noopduck/consoletools.git
+cd shell_customizations
+./zsh_setup.sh
 ```
 
 Fix Firefox theme to adhere to adawaita GTK4
