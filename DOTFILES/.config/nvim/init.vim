@@ -46,8 +46,18 @@ set tabstop=4
 set shiftwidth=4
 
 " Enable display of whitespace chars
-set list
-set listchars=eol:$,space:·,tab:>-,trail:.,extends:>,precedes:<
+function! Show_whitespace()
+  set list
+  set listchars=eol:$,space:·,tab:>-,trail:.,extends:>,precedes:<
+endfunction
+
+function! Hide_whitespace()
+  set list
+  set listchars=""
+endfunction
+
+" By default show whitespace
+call Show_whitespace()
 
 " SHOW TABLINE
 
