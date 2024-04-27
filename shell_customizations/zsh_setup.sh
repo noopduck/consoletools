@@ -29,6 +29,11 @@ echo "WHEN THIS SCRIPT PUTS YOU ON THE ZSH PROMPT, type: 'exit' in order to resu
 # Install zsh
 setup_software
 
+# Set gnome keyboard repeat rate and delay rates in order for a
+# snappier and more plesant shell, vim, editor e.t.c experience.
+gsettings set org.gnome.desktop.peripherals.keyboard repeat-interval 20
+gsettings set org.gnome.desktop.peripherals.keyboard delay 130
+
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 if [ -d ~/.oh-my-zsh ]; then
