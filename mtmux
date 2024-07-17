@@ -2,6 +2,9 @@
 
 export PATH=$PATH:~/.local/bin
 
+function find_auth_sock() {
+    export SSH_AUTH_SOCK="$(find /tmp/ -iname "*agent*" 2> /dev/null)"
+}
 # Avoid the shell uglyness under /dev/tty type term
 [ ! "$(tty | grep /dev/tty)" ] && {
     if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
@@ -13,6 +16,8 @@ export PATH=$PATH:~/.local/bin
 [ ! "$(ps -fe|grep ssh-agent|grep -v grep)" ] && {
         eval $(ssh-agent -s)
         ssh-add
+} || {
+    find_auth_sock
 }
 
 [[ $TERM_PROGRAM ]] && {
@@ -37,7 +42,9 @@ SESSIONS=$(tmux list-sessions | grep $SESSION)
         tmux rename-window -t $SESSION:0 'Chat'
         tmux send -t $SESSION:0 'TERM=tmux-256color ls' 'ENTER';
         tmux new-window -t $SESSION:1 -n 'Main'
+        find_auth_sock
         tmux new-window -t $SESSION:2 -n 'Code'
+        find_auth_sock
         tmux select-window -t $SESSION:0
 
         tmux set-window-option -g mode-keys vi
