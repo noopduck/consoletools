@@ -47,7 +47,7 @@ fi
     cd powerline-shell
     sudo python setup.py install
 
-    cd ..; rm -rf powerline-shell;
+    cd ..; sudo rm -rf powerline-shell;
 }
 
 # As long as it's not debian, install regularly
