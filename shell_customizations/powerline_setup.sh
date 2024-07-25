@@ -46,6 +46,8 @@ fi
     git clone https://github.com/b-ryan/powerline-shell
     cd powerline-shell
     sudo python setup.py install
+
+    cd ..; rm -rf powerline-shell;
 }
 
 # As long as it's not debian, install regularly
