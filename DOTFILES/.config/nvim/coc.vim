@@ -29,6 +29,7 @@ let g:coc_global_extensions = [
     \ 'coc-clangd',
     \ 'coc-snippets',
     \ 'coc-helper',
+    \ 'coc-sh',
     \]
 
 " Use tab for trigger completion with characters ahead and navigate
