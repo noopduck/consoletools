@@ -40,6 +40,8 @@ SESSIONS=$(tmux list-sessions | grep $SESSION)
         tmux new-session -d -s $SESSION
     }
 
+    tmux set-option -g mouse on
+
     tmux rename-window -t $SESSION:0 'Chat'
     tmux send -t $SESSION:0 'TERM=tmux-256color ls' 'ENTER';
     tmux new-window -t $SESSION:1 -n 'Main'
