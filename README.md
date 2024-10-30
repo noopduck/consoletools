@@ -1,3 +1,8 @@
+2024-10-30 - noopduck
+- neovim setup uses Lazy and Mason for plugin management.
+- neo-tree does not hide files by default
+- A lot of other changes
+
 2019-12-31 - noopduck
 -updated several times but last date was 2021-03-14
 
