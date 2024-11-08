@@ -1,5 +1,6 @@
 require("config.lazy")
 require("config.bubbles")
+require("config.telescope")
 require("maps")
 require("settings")
 require("options")
