@@ -1,5 +1,5 @@
 require("config.lazy")
-require("config.bubble_lualine")
+require("config.bubbles")
 require("maps")
 require("settings")
 require("options")
