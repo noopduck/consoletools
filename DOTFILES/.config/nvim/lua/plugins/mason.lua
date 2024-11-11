@@ -16,6 +16,9 @@ return {
 				"pyright",
 				"yamlls",
 				"lua_ls",
+				"bashls",
+				"rust_analyzer",
+				"dockerls",
 			},
 		})
 
@@ -26,6 +29,7 @@ return {
 				"isort", -- python formatter
 				"clang-format",
 				"black", -- python formatter
+				"shfmt", -- bash formatter
 				"pylint",
 				"luacheck",
 				"gitui",
