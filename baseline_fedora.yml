@@ -1,0 +1,95 @@
+---
+
+# Ansible playbook for setting up fedora as I like it
+#
+# systemctl start sshd
+# ansible-playbook -i inventory.ini baseline_fedora.yml -u noop -k -K -D
+#
+
+- name: Setup system
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install software
+      dnf:
+        name: 
+          - tlp
+          - remmina
+          - neovim
+          - nmap
+          - gdb
+          - clang
+          - cmake
+          - make
+          - gcc
+          - cutter-re
+
+        state: latest
+
+    - name: Install software from flatpak
+      flatpak:
+        name:
+          - md.obsidian.Obsidian
+          - org.signal.Signal
+          - org.freedesktop.Platform.openh264
+        state: present
+        method: system 
+
+    - name: Disable tuned
+      systemd_service:
+        name: tuned
+        enabled: false
+        state: stopped
+        
+    - name: Enable tlp
+      systemd_service:
+        name: tlp
+        enabled: true
+        state: started
+
+    - name: Get graphic card HW ID
+      shell: echo "0000:$(lspci|grep -i nvidia|cut -d" " -f1)"
+      register: NVHWID
+
+    - name: Display NVHWID
+      debug:
+        msg: "NVHWID {{ NVHWID.stdout }}"
+
+    - name: Add service that drains/disables nvidia dGPU
+      copy:
+        dest: /etc/systemd/system/nvidia-disable.service
+        content: |
+          [Unit]
+          Description=Disable Nvidia discrete GPU
+          
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/bin/nvidia-smi drain -p '{{ NVHWID.stdout }}' -m 1
+          
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd
+      systemd_service:
+        daemon_reload: true
+
+    - name: Check if nvidia-smi finds dGPU
+      shell: nvidia-smi -L
+      register: gpu_exists
+
+    - name: gpu found?
+      debug:
+        msg: "{{ gpu_exists.stdout }}"
+
+    - name: Enable the nvidia-disable.service for the dGPU drain
+      systemd_service:
+        name: nvidia-disable.service
+        enabled: true
+
+    - name: Start the dGPU drain if it's not alreay
+      systemd_service:
+        name: nvidia-disable.service
+        state: started
+      when: '"No devices found" not in gpu_exists.stdout'
+
