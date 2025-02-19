@@ -41,6 +41,11 @@
         name: tuned
         enabled: false
         state: stopped
+
+    - name: Copy the tlp.conf file into etc
+      copy:
+        src: tlp.conf
+        dest: /etc/tlp.conf
         
     - name: Enable tlp
       systemd_service:
