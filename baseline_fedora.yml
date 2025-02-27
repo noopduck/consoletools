@@ -1,5 +1,4 @@
 ---
-
 # Ansible playbook for setting up fedora as I like it
 #
 # systemctl start sshd
@@ -13,8 +12,9 @@
   tasks:
     - name: Install software
       dnf:
-        name: 
+        name:
           - tlp
+          - powertop
           - remmina
           - neovim
           - nmap
@@ -34,7 +34,7 @@
           - org.signal.Signal
           - org.freedesktop.Platform.openh264
         state: present
-        method: system 
+        method: system
 
     - name: Disable tuned
       systemd_service:
@@ -46,7 +46,7 @@
       copy:
         src: tlp.conf
         dest: /etc/tlp.conf
-        
+
     - name: Enable tlp
       systemd_service:
         name: tlp
@@ -67,11 +67,11 @@
         content: |
           [Unit]
           Description=Disable Nvidia discrete GPU
-          
+
           [Service]
           Type=oneshot
           ExecStart=/usr/bin/nvidia-smi drain -p '{{ NVHWID.stdout }}' -m 1
-          
+
           [Install]
           WantedBy=multi-user.target
 
@@ -97,4 +97,3 @@
         name: nvidia-disable.service
         state: started
       when: '"No devices found" not in gpu_exists.stdout'
-
