@@ -24,6 +24,7 @@
           - make
           - gcc
           - cutter-re
+          - bat
 
         state: latest
 
