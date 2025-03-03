@@ -97,3 +97,9 @@
         name: nvidia-disable.service
         state: started
       when: '"No devices found" not in gpu_exists.stdout'
+
+    - name: Make packagekit stop waiting before command not found
+      lineinfile:
+        path: /etc/PackageKit/CommandNotFound.conf
+        regexp: ^SoftwareSourceSearch=
+        line: SoftwareSourceSearch=false
