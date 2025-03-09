@@ -13,7 +13,6 @@
     - name: Install software
       dnf:
         name:
-          - tlp
           - powertop
           - remmina
           - neovim
@@ -36,23 +35,6 @@
           - org.freedesktop.Platform.openh264
         state: present
         method: system
-
-    - name: Disable tuned
-      systemd_service:
-        name: tuned
-        enabled: false
-        state: stopped
-
-    - name: Copy the tlp.conf file into etc
-      copy:
-        src: tlp.conf
-        dest: /etc/tlp.conf
-
-    - name: Enable tlp
-      systemd_service:
-        name: tlp
-        enabled: true
-        state: started
 
     - name: Get graphic card HW ID
       shell: echo "0000:$(lspci|grep -i nvidia|cut -d" " -f1)"
