@@ -25,3 +25,17 @@ o.inccommand = "split" -- When nonempty, shows the effects of :substitute, :smag
 o.splitright = true
 o.splitbelow = true -- When on, splitting a window will put the new window below the current one
 o.termguicolors = true
+
+o.list = true
+o.listchars = {
+	space = "·", -- Show spaces as "·"
+	tab = ">~", -- Show tabs as ">~"
+	trail = "~", -- Trailing spaces
+	extends = ">", -- When a line is too long on the right
+	precedes = "<", -- When a line is too long on the left
+	nbsp = "+", -- Non-breakable space
+	eol = "↲", -- Show the end of line as "↲"
+}
+
+vim.cmd("MasonUpdate")
+vim.cmd("MasonToolsUpdate")
