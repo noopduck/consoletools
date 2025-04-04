@@ -27,7 +27,7 @@ o.splitbelow = true -- When on, splitting a window will put the new window below
 o.termguicolors = true
 
 o.list = true
-o.listchars = {
+o.listchars:append({
 	space = "·", -- Show spaces as "·"
 	tab = ">~", -- Show tabs as ">~"
 	trail = "~", -- Trailing spaces
@@ -35,7 +35,11 @@ o.listchars = {
 	precedes = "<", -- When a line is too long on the left
 	nbsp = "+", -- Non-breakable space
 	eol = "↲", -- Show the end of line as "↲"
-}
+})
 
-vim.cmd("MasonUpdate")
-vim.cmd("MasonToolsUpdate")
+vim.cmd([[
+  highlight Normal guibg=none
+  highlight NonText guibg=none
+  highlight Normal ctermbg=none
+  highlight NonText ctermbg=none
+]])
