@@ -1,0 +1,8 @@
+require("config.lazy")
+require("config.bubbles")
+require("config.telescope")
+require("maps")
+require("settings")
+require("options")
+require("lualine").get_config()
+require("lualine").setup()

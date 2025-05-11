@@ -10,6 +10,7 @@ return {
 		require("mason-lspconfig").setup({
 			automatic_installation = true,
 			ensure_installed = {
+				"ansiblels",
 				"html",
 				"jsonls",
 				"clangd",
@@ -19,11 +20,16 @@ return {
 				"bashls",
 				"rust_analyzer",
 				"dockerls",
+				"gopls",
+				"cssls",
+				"omnisharp",
 			},
 		})
 
 		require("mason-tool-installer").setup({
 			ensure_installed = {
+				"pyright",
+				"codelldb",
 				"prettier",
 				"stylua", -- lua formatter
 				"isort", -- python formatter
@@ -34,6 +40,7 @@ return {
 				"luacheck",
 				"gitui",
 				"omnisharp",
+				"tree-sitter-cli",
 			},
 		})
 	end,
