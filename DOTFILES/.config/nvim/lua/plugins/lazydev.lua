@@ -40,13 +40,5 @@ return {
 			},
 		},
 	},
-
-	config = function()
-		local load = require("lspconfig")
-		load.lua_ls.setup({})
-		load.pyright.setup({})
-		load.clangd.setup({})
-		load.gopls.setup({})
-	end,
 	-- { "folke/neodev.nvim", enabled = false }, -- make sure to uninstall or disable neodev.nvim
 }
