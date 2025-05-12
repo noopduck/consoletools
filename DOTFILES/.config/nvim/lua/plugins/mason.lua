@@ -11,6 +11,7 @@ return {
 			automatic_installation = true,
 			ensure_installed = {
 				"ansiblels",
+				"dockerls",
 				"html",
 				"jsonls",
 				"clangd",

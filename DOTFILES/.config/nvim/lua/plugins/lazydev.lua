@@ -36,9 +36,14 @@ return {
 						-- make lazydev completions top priority (see `:h blink.cmp`)
 						score_offset = 100,
 					},
+					cmdline = {
+						-- ignores cmdline completions when executing shell commands
+						enabled = function()
+							return vim.fn.getcmdtype() ~= ":" or not vim.fn.getcmdline():match("^[%%0-9,'<>%-]*!")
+						end,
+					},
 				},
 			},
 		},
 	},
-	-- { "folke/neodev.nvim", enabled = false }, -- make sure to uninstall or disable neodev.nvim
 }
