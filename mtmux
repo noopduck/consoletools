@@ -1,48 +1,91 @@
 #!/bin/bash
-
 export PATH=$PATH:~/.local/bin
 
-# Avoid the shell uglyness under /dev/tty type term
-[ ! "$(tty | grep /dev/tty)" ] && {
-  if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
-  fi
+SSH_AGENT_ENV="${XDG_RUNTIME_DIR:-$HOME/.local/run}/ssh-agent.env"
+mkdir -p "$(dirname "$SSH_AGENT_ENV")"
+
+_agent_is_alive() {
+    [[ -S "$SSH_AUTH_SOCK" ]] || return 2
+    ssh-add -l &>/dev/null
+    local rc=$?
+    [[ $rc -lt 2 ]]
 }
 
-# Establish ssh-agent if none is running
-[ ! "$(ps -fe | grep ssh-agent | grep -v grep)" ] && {
-  eval $(ssh-agent -s)
-  ssh-add
+_start_agent() {
+    echo "Starting ssh-agent..."
+    eval "$(ssh-agent -s)" > /dev/null
+    printf 'export SSH_AUTH_SOCK=%s\nexport SSH_AGENT_PID=%s\n' \
+        "$SSH_AUTH_SOCK" "$SSH_AGENT_PID" > "$SSH_AGENT_ENV"
 }
 
-[[ $TERM_PROGRAM ]] && {
-  [[ $TERM_PROGRAM = "vscode" ]] && {
-    exit
-  }
+_find_auth_sock() {
+    local sock
+    sock="$(find /tmp/ -maxdepth 2 -name "agent.*" -user "$(whoami)" 2>/dev/null | head -1)"
+    [[ -S "$sock" ]] && export SSH_AUTH_SOCK="$sock"
 }
 
+[[ -f "$SSH_AGENT_ENV" ]] && source "$SSH_AGENT_ENV" &>/dev/null
+
+if _agent_is_alive; then
+	echo "ssh-agent is running ($(ssh-add -l | wc -l) key(s) loaded)"
+elif pgrep -u "$(whoami)" ssh-agent &>/dev/null; then
+    _find_auth_sock
+    if ! _agent_is_alive; then
+        pkill -u "$(whoami)" ssh-agent
+        _start_agent
+        ssh-add 
+    fi
+else
+    _start_agent
+    ssh-add
+fi
+
+if [[ -n "$TMUX" ]]; then
+    tmux setenv -g SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
+    tmux setenv -g SSH_AGENT_PID "$SSH_AGENT_PID"
+fi
 
 SESSION=$(whoami)
 
-SESSIONS=$(tmux list-sessions | grep $SESSION)
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    echo "Connecting to existing tmux-session '$SESSION'..."
+    exec tmux attach-session -t "$SESSION"
+fi
 
-[[ "$SESSIONS" =~ "no server running" ]] && {
-  SESSIONS=""
-}
-[[ "$SESSIONS" = "" ]] && {
-  [[ ! "$(uname -a)" =~ "microsoft-standard" ]] && {
-    systemd-run --scope --user tmux new-session -d -s $SESSION
-  } || {
-    tmux new-session -d -s $SESSION
-    tmux set -g update-environment "SSH_AUTH_SOCK SSH_CONNECTION SSH_CLIENT SSH_TTY"
-  }
-  tmux rename-window -t $SESSION:0 'Chat'
-  tmux send -t $SESSION:0 'TERM=tmux-256color ls' 'ENTER'
-  tmux new-window -t $SESSION:1 -n 'Main'
-  tmux new-window -t $SESSION:2 -n 'Code'
-  tmux select-window -t $SESSION:0
-}
+echo "Establishing a new tmux-session '$SESSION'..."
 
-[[ ! "$TMUX" ]] && {
-  tmux attach-session -t $SESSION:0
-}
+if [[ ! "$(uname -r)" =~ "microsoft-standard" ]]; then
+    systemd-run --scope --user \
+        env SSH_AUTH_SOCK="$SSH_AUTH_SOCK" SSH_AGENT_PID="$SSH_AGENT_PID" \
+        tmux new-session -d -s "$SESSION" -x "$(tput cols)" -y "$(tput lines)"
+else
+    env SSH_AUTH_SOCK="$SSH_AUTH_SOCK" SSH_AGENT_PID="$SSH_AGENT_PID" \
+        tmux new-session -d -s "$SESSION" -x "$(tput cols)" -y "$(tput lines)"
+fi
+
+tmux setenv -g SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
+tmux setenv -g SSH_AGENT_PID "$SSH_AGENT_PID"
+
+tmux set-option  -g mouse on
+tmux set-option  -g mode-keys vi
+tmux set-option  -g update-environment "SSH_AUTH_SOCK SSH_AGENT_PID"
+
+tmux bind h select-pane -L
+tmux bind j select-pane -D
+tmux bind k select-pane -U
+tmux bind l select-pane -R
+tmux bind -n M-k resize-pane -U 5
+tmux bind -n M-j resize-pane -D 5
+tmux bind -n M-h resize-pane -L 5
+tmux bind -n M-l resize-pane -R 5
+
+tmux rename-window -t "$SESSION:0" 'Chat'
+tmux send-keys    -t "$SESSION:0" 'TERM=tmux-256color ls' Enter
+
+tmux new-window -t "$SESSION:1" -n 'Main'
+
+tmux new-window -t "$SESSION:2" -n 'Code'
+
+tmux select-window -t "$SESSION:0"
+
+exec tmux attach-session -t "$SESSION"
