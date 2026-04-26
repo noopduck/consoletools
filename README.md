@@ -1,98 +1,161 @@
-2024-10-30 - noopduck
-- neovim setup uses Lazy and Mason for plugin management.
-- neo-tree does not hide files by default
-- A lot of other changes
+# consoletools
 
-2019-12-31 - noopduck
--updated several times but last date was 2021-03-14
+Personal dotfiles and terminal setup. Covers Neovim, tmux (with `mtmux`), shell, and window manager configs. Aimed at getting a productive, good-looking console environment up fast.
 
-2021-09-10 - noopduck
--Making scripts (Windows) WSL2 friendlier
--Can run WSL2 Ubuntu 20.04 neovim with ConquerOfCode (coc.nvim)
--Tmux scripts (powerline) should add path setup inside .zshrc correctly now
--Launch tmux session script works
+---
 
+## Neovim
 
+### `DOTFILES/.config/nvim/`
 
-Shell/terminal candy automations.
-Intention is to have something up and running fast, it must be practical and good looking
-I think this is a good mix.
+Targets **Neovim 0.12+**. Uses the new `vim.pack.add` API (no Lazy, no external plugin manager) and the built-in LSP client.
 
-Disclaimer is a given, but i use this myself and it works very well for me.
-if someone has suggestions for improvements I am certain that there is room for that,
-make an issue or what it's called and I will most likely look at it.
+**Plugins installed via `vim.pack.add`:**
 
-**__________________________________________________________________________________________**
+| Plugin | Purpose |
+|---|---|
+| `mason.nvim` | LSP/tool installer |
+| `nvim-lspconfig` | LSP configuration helpers |
+| `efmls-configs-nvim` | EFM language server configs |
+| `nerdtree` | File tree |
+| `catppuccin/nvim` | Colorscheme |
 
-![Animation of functional i3 setup](https://raw.githubusercontent.com/noopduck/consoletools/master/consoletools.gif)
+**LSP servers enabled:** `lua_ls`, `pyright`, `gopls`, `bashls`, `jsonls`, `ts_ls`, `yamlls`, `efm`
 
-![Image of nvim working with my setup](https://raw.githubusercontent.com/noopduck/consoletools/master/nvim.gif)
+**EFM linters/formatters by language:**
 
-**__________________________________________________________________________________________**
+| Language | Linter | Formatter |
+|---|---|---|
+| Python | flake8 | black, isort |
+| Go | golangci-lint | gofmt |
+| TypeScript/JavaScript | eslint | prettier |
+| Shell/Bash | shellcheck | shfmt |
+| YAML | yamllint | prettier |
+| JSON | jsonlint | prettier |
+| Lua | luacheck | stylua |
+| Markdown | markdownlint | prettier |
 
-NVIM setup
+**Key bindings (normal mode):**
 
-```shell
-git clone https://github.com/noopduck/consoletools.git
-cd consoletools/vim
-./nvim_setup.sh
-```
+| Key | Action |
+|---|---|
+| `gd` / `gD` | Go to definition / declaration |
+| `gr` | References |
+| `gi` | Go to implementation |
+| `K` | Hover docs |
+| `<leader>rn` | Rename symbol |
+| `<leader>ca` | Code action |
+| `<leader>d` | Diagnostic float |
+| `[d` / `]d` | Prev / next diagnostic |
+| `<leader>e` | Toggle NERDTree |
+| `<leader>f` | Find current file in NERDTree |
+| `<leader>F` | Format buffer |
 
-Note: FreeBSD users first need to install a C compiler and a few other things.
-```shell
-pgk install gcc # in order to build node
-/usr/local/bin/python3.9 -m ensurepip
-python3.9 -m pip install pynvim
-
-```
-update into this::
-let g:python3_host_prog = '/usr/local/bin/python3.9'
-into ~/.config/nvim/init.vim
-
-For some distributions /usr/bin/python may be pointing to python2 instead of python3 in these cases:
-
-```shell
-
-[[ -L /usr/bin/python ]] && [[ ! $(ls -l /usr/bin/python|grep python3) ]] && { 
-    sudo unlink /usr/bin/python;
-    sudo ln -s /usr/bin/python3 /usr/bin/python;
-}
-```
-
-Or specify
+**Copy config:**
 
 ```shell
-let g:python3_host_prog = '/usr/bin/python3'
+cp -r DOTFILES/.config/nvim ~/.config/nvim
 ```
-inside ~/.config/nvim/init.vim
 
-**__________________________________________________________________________________________**
+---
 
-TMUX+Powerline setup 
+## Tmux
 
-![Image of nvim working with my setup](https://raw.githubusercontent.com/noopduck/consoletools/master/shell_customizations/tmux-powerline.png)
+### Config (`DOTFILES/.tmux.conf`)
 
-ps: This code unlinks /usr/bin/python and links it to /usr/bin/python3
-at least then you are aware in case you use another approach for it.
+Catppuccin-themed setup via [TPM](https://github.com/tmux-plugins/tpm).
+
+**Plugins:**
+
+| Plugin | Purpose |
+|---|---|
+| `catppuccin/tmux` | Status bar theme |
+| `tmux-sensible` | Sensible defaults |
+| `tmux-yank` | System clipboard yank |
+| `tmux-continuum` | Session persistence / auto-restore |
+| `tmux-thumbs` | Hint-mode text picker |
+| `tmux-fzf` | Fuzzy finder integration |
+| `tmux-fzf-url` | Open URLs via fzf |
+| `tmux-sessionx` | Session manager (bound to `prefix + o`) |
+| `tmux-floax` | Floating pane (bound to `prefix + p`) |
+
+**Keybindings (vi-mode pane navigation):**
+
+| Key | Action |
+|---|---|
+| `prefix + h/j/k/l` | Select pane (vim directions) |
+| `Alt + h/j/k/l` | Resize pane by 5 (no prefix) |
+| `prefix + o` | Open sessionx session manager |
+| `prefix + p` | Toggle floating pane (floax) |
+
+Status bar shows: session name (left) — directory, time (right). Sessions persist across reboots via `tmux-continuum`.
+
+**Install:**
 
 ```shell
-git clone https://github.com/noopduck/consoletools.git
-cd consoletools/shell_customizations
-./tmux_setup.sh
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+cp DOTFILES/.tmux.conf ~/.tmux.conf
+# Inside tmux: prefix + I  (capital i) to install plugins
 ```
 
-ZSH setup
-
-Customization of zsh, adds some nice fonts to local user and allow to theme it a bit
+Or use the setup script (Debian/Fedora/Manjaro):
 
 ```shell
-git clone https://github.com/noopduck/consoletools.git
-cd shell_customizations
-./zsh_setup.sh
+./shell_customizations/tmux_setup.sh
 ```
 
-Fix Firefox theme to adhere to adawaita GTK4
-curl -s -o- https://raw.githubusercontent.com/rafaelmardojai/firefox-gnome-theme/master/scripts/install-by-curl.sh | bash
+---
 
-FONTS...
-https://github.com/ryanoasis/nerd-fonts/blob/master/src/glyphs/PowerlineExtraSymbols.otf?raw=true
+### `mtmux` — session launcher
+
+A script that manages a persistent named tmux session (named after the current user). Run it instead of `tmux` to start or reattach.
+
+**What it does:**
+
+1. Manages `ssh-agent` — starts one if needed, reuses an existing one, and propagates `SSH_AUTH_SOCK` into the tmux environment so it stays available across detach/reattach.
+2. Attaches to an existing session if one is running.
+3. Creates a new session with three named windows if none exists:
+   - `0: Chat`
+   - `1: Main`
+   - `2: Code`
+4. On Linux (non-WSL), launches the session under `systemd-run --scope` so it survives the login session.
+
+**Install:**
+
+```shell
+cp mtmux ~/.local/bin/mtmux
+chmod +x ~/.local/bin/mtmux
+```
+
+Or let `tmux_setup.sh` do it. Then just run:
+
+```shell
+mtmux
+```
+
+---
+
+## Other dotfiles
+
+| Path | Notes |
+|---|---|
+| `DOTFILES/.config/ghostty/` | Ghostty terminal config + Catppuccin Mocha theme |
+| `DOTFILES/.config/alacritty/` | Alacritty config |
+| `DOTFILES/.config/zsh/` | ZSH config (oh-my-zsh, p10k) |
+| `DOTFILES/.config/fish/` | Fish shell config + nvm integration |
+| `DOTFILES/.config/i3/` | i3 window manager config |
+| `DOTFILES/.config/sway/` | Sway config + wofi CSS |
+| `DOTFILES/.bashrc` | Bash config |
+| `DOTFILES/.Xresources` | X resources |
+
+---
+
+## Nerd Fonts
+
+Required for the status bar icons and NERDTree glyphs:
+
+```shell
+wget https://github.com/ryanoasis/nerd-fonts/blob/master/src/glyphs/PowerlineExtraSymbols.otf?raw=true
+```
+
+Or install any [Nerd Font](https://www.nerdfonts.com/) and set it as your terminal font.
