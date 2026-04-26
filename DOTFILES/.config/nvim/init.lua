@@ -13,7 +13,6 @@ vim.o.softtabstop = 2
 vim.pack.add {
 	'https://github.com/mason-org/mason.nvim',
 	'https://github.com/neovim/nvim-lspconfig',
-	'https://github.com/stevearc/oil.nvim',
 	'https://github.com/catppuccin/nvim',
   'https://github.com/creativenull/efmls-configs-nvim',
   'https://github.com/preservim/nerdtree',
@@ -61,7 +60,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
 })
 
-require("oil").setup()
 vim.cmd.colorscheme('catppuccin')
 
 -- NERDTree
