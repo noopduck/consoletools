@@ -132,4 +132,3 @@ vim.lsp.config('efm', {
 
 -- Format buffer
 vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, { desc = 'Format file' })
-
