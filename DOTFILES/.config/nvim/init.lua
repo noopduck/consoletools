@@ -1,4 +1,9 @@
 vim.g.mapleader = ' '
+
+-- Disable optional providers that aren't used
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_python3_provider = 0
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.signcolumn = 'yes:1'
@@ -30,8 +35,6 @@ require("catppuccin").setup({
   flavor = "mocha",
 })
 vim.cmd.colorscheme('catppuccin')
-
-require("mason").setup()
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
@@ -68,6 +71,30 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.keymap.set('n', '<leader>e', ':NERDTreeToggle<CR>', { silent = true, desc = 'Toggle NERDTree' })
 vim.keymap.set('n', '<leader>f', ':NERDTreeFind<CR>',   { silent = true, desc = 'Find file in NERDTree' })
 
+require("mason").setup({
+  ensure_installed = {
+    'lua-language-server',
+    'prettier',
+    'stylua',
+    'pyright',
+    'gopls',
+    'bash-language-server',
+    'json-lsp',
+    'yaml-language-server',
+    'efm',
+  },
+})
+
+vim.lsp.enable({
+  'lua_ls',
+  'pyright',
+  'gopls',
+  'bashls',
+  'jsonls',
+  'yamlls',
+  'efm',
+})
+
 vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
@@ -77,60 +104,47 @@ vim.lsp.config('lua_ls', {
   },
 })
 
-vim.lsp.config('pyright', {})
-vim.lsp.config('gopls', {})
-vim.lsp.config('bashls', {})
-vim.lsp.config('jsonls', {})
-vim.lsp.config('ts_ls', {})
 vim.lsp.config('yamlls', {
   settings = {
     yaml = { schemaStore = { enable = true } },
   },
 })
 
-vim.lsp.enable({
-  'lua_ls', 'pyright', 'gopls', 'bashls',
-  'jsonls', 'ts_ls', 'yamlls', 'efm',
-})
+-- Register linters and formatters per language
+local eslint = require('efmls-configs.linters.eslint')
+local prettier = require('efmls-configs.formatters.prettier')
+local stylua = require('efmls-configs.formatters.stylua')
+local languages = {
+  typescript = { eslint, prettier },
+  lua = { stylua },
+}
 
--- EFM linters + formatters
-local black        = require('efmls-configs.formatters.black')
-local isort        = require('efmls-configs.formatters.isort')
-local flake8       = require('efmls-configs.linters.flake8')
-local gofmt        = require('efmls-configs.formatters.gofmt')
-local golangci     = require('efmls-configs.linters.golangci_lint')
-local prettier     = require('efmls-configs.formatters.prettier')
-local eslint       = require('efmls-configs.linters.eslint')
-local shellcheck   = require('efmls-configs.linters.shellcheck')
-local shfmt        = require('efmls-configs.formatters.shfmt')
-local yamllint     = require('efmls-configs.linters.yamllint')
-local jsonlint     = require('efmls-configs.linters.jsonlint')
-local luacheck     = require('efmls-configs.linters.luacheck')
-local stylua       = require('efmls-configs.formatters.stylua')
-local markdownlint = require('efmls-configs.linters.markdownlint')
+-- Or use the defaults provided by this plugin
+-- check doc/SUPPORTED_LIST.md for the supported languages
+--
+-- local languages = require('efmls-configs.defaults').languages()
 
-vim.lsp.config('efm', {
-  init_options = { documentFormatting = true, documentRangeFormatting = true },
+local efmls_config = {
+  filetypes = vim.tbl_keys(languages),
   settings = {
-    languages = {
-      python     = { flake8, black, isort },
-      go         = { golangci, gofmt },
-      typescript = { eslint, prettier },
-      javascript = { eslint, prettier },
-      sh         = { shellcheck, shfmt },
-      bash       = { shellcheck, shfmt },
-      yaml       = { yamllint, prettier },
-      json       = { jsonlint, prettier },
-      lua        = { luacheck, stylua },
-      markdown   = { markdownlint, prettier },
-      html       = { prettier },
-    },
+    rootMarkers = { '.git/' },
+    languages = languages,
   },
-  filetypes = {
-    'python', 'go', 'typescript', 'javascript',
-    'sh', 'bash', 'yaml', 'json', 'lua', 'markdown', 'html',
+  init_options = {
+    documentFormatting = true,
+    documentRangeFormatting = true,
   },
-})
+}
+
+-- If using nvim >= 0.11 then use the following
+vim.lsp.config('efm', vim.tbl_extend('force', efmls_config, {
+  cmd = { 'efm-langserver' },
+
+  -- Pass your custom lsp config below like on_attach and capabilities
+  --
+  -- on_attach = on_attach,
+  -- capabilities = capabilities,
+}))
 
 -- Format buffer
 vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, { desc = 'Format file' })
