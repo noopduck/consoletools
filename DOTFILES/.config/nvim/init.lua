@@ -11,21 +11,25 @@ vim.o.shiftwidth = 2
 vim.o.softtabstop = 2
 
 vim.pack.add {
-	'https://github.com/mason-org/mason.nvim',
-	'https://github.com/neovim/nvim-lspconfig',
-	'https://github.com/catppuccin/nvim',
-  'https://github.com/creativenull/efmls-configs-nvim',
-  'https://github.com/preservim/nerdtree',
+  { src = 'https://github.com/mason-org/mason.nvim', name = 'mason.nvim' },
+  { src = 'https://github.com/neovim/nvim-lspconfig', name = 'nvim-lspconfig' },
+  { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
+  { src = 'https://github.com/creativenull/efmls-configs-nvim', name = 'efmls-configs-nvim' },
+  { src = 'https://github.com/preservim/nerdtree', name = 'nerdtree' },
+  { src = 'https://github.com/nvim-lualine/lualine.nvim', name = 'lualine.nvim' },
 }
 
-local function packadd(name)
-  vim.cmd("packadd " .. name)
-end
+vim.cmd.packadd 'mason.nvim'
+vim.cmd.packadd 'nvim-lspconfig'
+vim.cmd.packadd 'catppuccin'
+vim.cmd.packadd 'efmls-configs-nvim'
+vim.cmd.packadd 'nerdtree'
+vim.cmd.packadd 'lualine.nvim'
 
-packadd("efmls-configs-nvim")
-packadd("nvim-lspconfig")
-packadd("mason.nvim")
-packadd("nerdtree")
+require("catppuccin").setup({
+  flavor = "mocha",
+})
+vim.cmd.colorscheme('catppuccin')
 
 require("mason").setup()
 
@@ -59,8 +63,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
 })
-
-vim.cmd.colorscheme('catppuccin')
 
 -- NERDTree
 vim.keymap.set('n', '<leader>e', ':NERDTreeToggle<CR>', { silent = true, desc = 'Toggle NERDTree' })
@@ -132,3 +134,69 @@ vim.lsp.config('efm', {
 
 -- Format buffer
 vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, { desc = 'Format file' })
+
+-- Bubbles config for lualine
+-- Author: lokesh-krishna
+-- MIT license, see LICENSE for more details.
+
+-- Catppuccin Mocha palette
+local m = {
+  base   = '#1E1E2E',
+  mantle = '#181825',
+  crust  = '#11111B',
+  text   = '#CDD6F4',
+  subtext0 = '#A6ADC8',
+  surface1 = '#313244',
+  blue   = '#89B4FA',
+  teal   = '#94E2D5',
+  red    = '#F38BA8',
+  mauve  = '#cba6f7',
+}
+
+local bubbles_theme = {
+  normal = {
+    a = { fg = m.base, bg = m.mauve },
+    b = { fg = m.text, bg = m.surface1 },
+    c = { fg = m.text },
+  },
+
+  insert = { a = { fg = m.base, bg = m.blue } },
+  visual = { a = { fg = m.base, bg = m.teal } },
+  replace = { a = { fg = m.base, bg = m.red } },
+
+  inactive = {
+    a = { fg = m.text, bg = m.base },
+    b = { fg = m.text, bg = m.base },
+    c = { fg = m.text },
+  },
+}
+
+require('lualine').setup {
+  options = {
+    theme = bubbles_theme,
+    component_separators = '',
+    section_separators = { left = '', right = '' },
+  },
+  sections = {
+    lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
+    lualine_b = { 'filename', 'branch' },
+    lualine_c = {
+      '%=', --[[ add your center components here in place of this comment ]]
+    },
+    lualine_x = {},
+    lualine_y = { 'filetype', 'progress' },
+    lualine_z = {
+      { 'location', separator = { right = '' }, left_padding = 2 },
+    },
+  },
+  inactive_sections = {
+    lualine_a = { 'filename' },
+    lualine_b = {},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = { 'location' },
+  },
+  tabline = {},
+  extensions = {},
+}
