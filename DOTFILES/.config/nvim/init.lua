@@ -71,19 +71,32 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.keymap.set('n', '<leader>e', ':NERDTreeToggle<CR>', { silent = true, desc = 'Toggle NERDTree' })
 vim.keymap.set('n', '<leader>f', ':NERDTreeFind<CR>',   { silent = true, desc = 'Find file in NERDTree' })
 
-require("mason").setup({
-  ensure_installed = {
-    'lua-language-server',
-    'prettier',
-    'stylua',
-    'pyright',
-    'gopls',
-    'bash-language-server',
-    'json-lsp',
-    'yaml-language-server',
-    'efm',
-  },
-})
+vim.schedule(function()
+  require("mason").setup()
+
+  local registry = require('mason-registry')
+  registry.refresh(function()
+    local ensure_installed = {
+      'lua-language-server',
+      'prettier',
+      'stylua',
+      'pyright',
+      'gopls',
+      'bash-language-server',
+      'json-lsp',
+      'yaml-language-server',
+      'efm-langserver',
+    }
+
+    for _, name in ipairs(ensure_installed) do
+      local ok, pkg = pcall(registry.get_package, name)
+      if ok and not pkg:is_installed() then
+        print(('Installing Mason package: %s'):format(name))
+        pkg:install()
+      end
+    end
+  end)
+end)
 
 vim.lsp.enable({
   'lua_ls',
