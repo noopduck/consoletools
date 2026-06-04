@@ -43,7 +43,31 @@ require("catppuccin").setup({
 })
 vim.cmd.colorscheme('catppuccin')
 
-require("mason").setup()
+local mason_ensure_installed = {
+  'black',
+  'isort',
+  'flake8',
+  'golangci-lint',
+  'shellcheck',
+  'shfmt',
+  'yamllint',
+  'luacheck',
+  'markdownlint',
+}
+
+require('mason').setup({
+  ensure_installed = mason_ensure_installed,
+})
+
+local registry = require('mason-registry')
+registry.refresh()
+for _, pkg_name in ipairs(mason_ensure_installed) do
+  local pkg = registry.get_package(pkg_name)
+  if pkg and not pkg:is_installed() then
+    vim.notify(('Installing %s...'):format(pkg_name), vim.log.levels.INFO)
+    pkg:install()
+  end
+end
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
