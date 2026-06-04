@@ -10,6 +10,16 @@ vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.o.softtabstop = 2
 
+-- Keymap helper for cleaner code
+local map = vim.keymap.set
+local opts = { noremap = true, silent = true }
+
+-- Move between windows with Ctrl + h/j/k/l in NORMAL mode
+map('n', '<C-h>', '<C-w>h', opts)
+map('n', '<C-j>', '<C-w>j', opts)
+map('n', '<C-k>', '<C-w>k', opts)
+map('n', '<C-l>', '<C-w>l', opts)
+
 vim.pack.add {
   { src = 'https://github.com/mason-org/mason.nvim', name = 'mason.nvim', version = 'main' },
   { src = 'https://github.com/neovim/nvim-lspconfig', name = 'nvim-lspconfig' },
@@ -70,46 +80,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.keymap.set('n', '<leader>e', ':NERDTreeToggle<CR>', { silent = true, desc = 'Toggle NERDTree' })
 vim.keymap.set('n', '<leader>f', ':NERDTreeFind<CR>',   { silent = true, desc = 'Find file in NERDTree' })
 
-<<<<<<< HEAD
-vim.schedule(function()
-  require("mason").setup()
-
-  local registry = require('mason-registry')
-  registry.refresh(function()
-    local ensure_installed = {
-      'lua-language-server',
-      'prettier',
-      'stylua',
-      'pyright',
-      'gopls',
-      'bash-language-server',
-      'json-lsp',
-      'yaml-language-server',
-      'efm-langserver',
-    }
-
-    for _, name in ipairs(ensure_installed) do
-      local ok, pkg = pcall(registry.get_package, name)
-      if ok and not pkg:is_installed() then
-        print(('Installing Mason package: %s'):format(name))
-        pkg:install()
-      end
-    end
-  end)
-end)
-
-vim.lsp.enable({
-  'lua_ls',
-  'pyright',
-  'gopls',
-  'bashls',
-  'jsonls',
-  'yamlls',
-  'efm',
-})
-
-=======
->>>>>>> 6d89f7c (Added gitsign and a load of mason plugins/linters e.t.c)
 vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
