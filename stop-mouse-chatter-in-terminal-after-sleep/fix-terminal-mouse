@@ -1,0 +1,10 @@
+#!/bin/sh
+case $1/$2 in
+  post/*)
+    # Sends the disable mouse tracking sequence to all active pts terminals
+    for tty in /dev/pts/*; do
+      [ -w "$tty" ] && printf '\e[?1000l\e[?1006l\e[?1015l' > "$tty" 2>/dev/null
+    done
+    ;;
+esac
+
