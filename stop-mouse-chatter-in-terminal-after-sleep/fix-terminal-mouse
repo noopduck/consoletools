@@ -1,10 +1,13 @@
 #!/bin/sh
 case $1/$2 in
   post/*)
-    # Sends the disable mouse tracking sequence to all active pts terminals
+    # Sends the disable mouse tracking sequence to all active pts terminals.
+    # 1000=X10, 1002=button events, 1003=any-event tracking,
+    # 1005=SGR, 1006=SGR extended coords, 1015=urxvt extended.
     for tty in /dev/pts/*; do
-      [ -w "$tty" ] && printf '\e[?1000l\e[?1006l\e[?1015l' > "$tty" 2>/dev/null
+      [ -w "$tty" ] && printf '\e[?1000l\e[?1002l\e[?1003l\e[?1005l\e[?1006l\e[?1015l' > "$tty" 2>/dev/null
     done
     ;;
 esac
+exit 0
 
