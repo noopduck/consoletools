@@ -107,7 +107,12 @@ vim.keymap.set('n', '<leader>f', ':NERDTreeFind<CR>',   { silent = true, desc = 
 vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
+      runtime = { version = 'LuaJIT' },
       diagnostics = { globals = { 'vim' } },
+      workspace = {
+        checkThirdParty = false,
+        library = { vim.env.VIMRUNTIME },
+      },
       telemetry = { enable = false },
     },
   },
