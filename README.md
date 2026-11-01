@@ -101,7 +101,7 @@ cp DOTFILES/.tmux.conf ~/.tmux.conf
 Or use the setup script (Debian/Fedora/Manjaro):
 
 ```shell
-./shell_customizations/tmux_setup.sh
+./shell_customizations/setup.sh --tmux
 ```
 
 ---
@@ -144,8 +144,12 @@ mtmux
 | `DOTFILES/.config/zsh/` | ZSH config (oh-my-zsh, p10k) |
 | `DOTFILES/.config/fish/` | Fish shell config + nvm integration |
 | `DOTFILES/.config/i3/` | i3 window manager config |
+| `DOTFILES/.config/kitty/` | Kitty terminal config |
 | `DOTFILES/.config/sway/` | Sway config + wofi CSS |
+| `DOTFILES/.config/dwm/` | dwm window manager config + dmenu helper |
+| `DOTFILES/.config/nvimlazy/` | LazyVim Neovim config (alternative to `nvim/`) |
 | `DOTFILES/.bashrc` | Bash config |
+| `DOTFILES/.inputrc` | Readline config |
 | `DOTFILES/.Xresources` | X resources |
 
 ---
