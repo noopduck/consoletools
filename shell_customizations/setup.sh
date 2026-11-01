@@ -11,6 +11,7 @@ set -euo pipefail
 #   ./setup.sh --tmux           # just tmux
 #   ./setup.sh --zsh            # just zsh
 #   ./setup.sh --fzf            # just fzf
+#   ./setup.sh --ptyxis-transparency # set ptyxis profile opacity (ptyxis hosts only)
 #   ./setup.sh --dry-run        # show what would be done without making changes
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -354,6 +355,45 @@ setup_zsh() {
 }
 
 # ---------------------------------------------------------------------------
+# Ptyxis transparency
+# ---------------------------------------------------------------------------
+# Sets the ptyxis profile opacity (0.85) for every profile on this host.
+# No-op on hosts that don't use ptyxis — passing this flag IS the opt-in.
+setup_ptyxis_transparency() {
+    step "Ptyxis transparency"
+
+    if ! command -v ptyxis &>/dev/null; then
+        warn "ptyxis is not installed on this host, skipping"
+        return 0
+    fi
+    if ! command -v gsettings &>/dev/null \
+       || ! gsettings list-schemas 2>/dev/null | grep -q "org.gnome.Ptyxis"; then
+        warn "org.gnome.Ptyxis gsettings schema not found, skipping"
+        return 0
+    fi
+
+    local opacity=0.85
+    local profiles uuid
+    profiles="$(gsettings get org.gnome.Ptyxis profile-uuids)"
+    if [[ -z "$profiles" ]]; then
+        warn "No ptyxis profiles found, skipping"
+        return 0
+    fi
+
+    # gsettings prints string arrays like ['uuid1', 'uuid2'] — strip to bare words
+    for uuid in $(echo "$profiles" | tr -d "[]'" | tr ',' ' '); do
+        if "$DRY_RUN"; then
+            info "[dry-run] would set ptyxis profile $uuid opacity $opacity"
+        else
+            gsettings set "org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/$uuid/" opacity "$opacity"
+            ok "Set ptyxis profile $uuid opacity $opacity"
+        fi
+    done
+
+    APPLIED+=(ptyxis-transparency)
+}
+
+# ---------------------------------------------------------------------------
 # Menu / CLI
 # ---------------------------------------------------------------------------
 show_menu() {
@@ -363,10 +403,11 @@ show_menu() {
     echo "  1) Tmux        — tmux + tpm + remote config"
     echo "  2) Zsh         — zsh + oh-my-zsh + powerlevel10k + fonts"
     echo "  4) Fzf         — fzf with shell completions"
-    echo "  3) All         — tmux + zsh + fzf"
+    echo "  5) Ptyxis      — ptyxis profile opacity 0.85 (ptyxis hosts only)"
+    echo "  3) All         — tmux + zsh + fzf + ptyxis"
     echo "  0) Quit"
     echo ""
-    read -rp "Choose [1-4,0]: " choice
+    read -rp "Choose [1-5,0]: " choice
     echo "$choice"
 }
 
@@ -377,6 +418,7 @@ run_selected() {
             tmux)      setup_tmux ;;
             zsh)       setup_zsh ;;
             fzf)       setup_fzf ;;
+            ptyxis-transparency) setup_ptyxis_transparency ;;
             *)         err "Unknown component: $c"; return 1 ;;
         esac
     done
@@ -392,12 +434,13 @@ main() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --dry-run)  DRY_RUN=true; shift ;;
-            --all)      components=(tmux zsh fzf); shift ;;
+            --all)      components=(tmux zsh fzf ptyxis-transparency); shift ;;
             --tmux)      components+=(tmux); shift ;;
             --zsh)       components+=(zsh); shift ;;
             --fzf)       components+=(fzf); shift ;;
+            --ptyxis-transparency) components+=(ptyxis-transparency); shift ;;
             -h|--help)
-                echo "Usage: $0 [--all|--tmux|--zsh|--fzf|--dry-run]"
+                echo "Usage: $0 [--all|--tmux|--zsh|--fzf|--ptyxis-transparency|--dry-run]"
                 exit 0 ;;
             *) err "Unknown argument: $1"; exit 1 ;;
         esac
@@ -410,7 +453,8 @@ main() {
             1) components=(tmux) ;;
             2) components=(zsh) ;;
             4) components=(fzf) ;;
-            3) components=(tmux zsh fzf) ;;
+            5) components=(ptyxis-transparency) ;;
+            3) components=(tmux zsh fzf ptyxis-transparency) ;;
             *) exit 0 ;;
         esac
     fi
